@@ -42,4 +42,8 @@ public class AssigneeList implements Serializable {
     public int size () {
         return counter;
     }
+
+    public Assignee[] getAssignees() {
+        return assignees;
+    }
 }

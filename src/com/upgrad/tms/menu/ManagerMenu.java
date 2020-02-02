@@ -3,6 +3,7 @@ package com.upgrad.tms.menu;
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.exception.AssigneeListFullException;
 import com.upgrad.tms.repository.AssigneeRepository;
+import com.upgrad.tms.repository.ManagerRepository;
 import com.upgrad.tms.util.AssigneeList;
 
 import java.io.IOException;
@@ -12,10 +13,12 @@ import java.util.Scanner;
 public class ManagerMenu implements OptionsMenu {
 
     private AssigneeRepository assigneeRepository;
+    private ManagerRepository managerRepository;
 
     public ManagerMenu()  {
         try {
             assigneeRepository = AssigneeRepository.getInstance();
+            managerRepository = ManagerRepository.getInstance();
         } catch (ClassNotFoundException ex){
             System.out.println("Class not found");
             System.exit(1);
@@ -43,13 +46,13 @@ public class ManagerMenu implements OptionsMenu {
         }
         switch (choice) {
             case 1:
-                createUser();
+                createUser(); //done
                 break;
             case 2:
-                displayAllUsers();
+                displayAllUsers();//done
                 break;
             case 3:
-                createManager();
+                createManager();//done
                 break;
             case 4:
                 createTaskAndAssign();
@@ -80,6 +83,12 @@ public class ManagerMenu implements OptionsMenu {
     }
 
     private void createManager() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter username");
+        String username = sc.nextLine();
+        System.out.println("Enter password");
+        String password = sc.nextLine();
+        managerRepository.saveManager(username, password);
     }
 
     private void displayAllUsers() {
