@@ -1,9 +1,30 @@
 package com.upgrad.tms.menu;
 
+import com.upgrad.tms.entities.Assignee;
+import com.upgrad.tms.exception.AssigneeListFullException;
+import com.upgrad.tms.repository.AssigneeRepository;
+import com.upgrad.tms.util.AssigneeList;
+
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-class ManagerMenu implements OptionsMenu {
+public class ManagerMenu implements OptionsMenu {
+
+    private AssigneeRepository assigneeRepository;
+
+    public ManagerMenu()  {
+        try {
+            assigneeRepository = AssigneeRepository.getInstance();
+        } catch (ClassNotFoundException ex){
+            System.out.println("Class not found");
+            System.exit(1);
+        } catch (IOException io){
+            System.out.println("io exception");
+            System.exit(1);
+        }
+    }
+
     @Override
     public void showTopOptions() {
         Scanner sc = new Scanner(System.in);
@@ -62,8 +83,33 @@ class ManagerMenu implements OptionsMenu {
     }
 
     private void displayAllUsers() {
+        AssigneeList allAssignees = assigneeRepository.getAssigneeList();
+        if (allAssignees.size() == 0) {
+            System.out.println("No assignees has been added");
+            return;
+        }
+        for (int i = 0; i < allAssignees.size(); i++) {
+            Assignee assignee = allAssignees.get(i);
+            System.out.println("Id: " + assignee.getId() + " Name: " + assignee.getName() + " UserName: " +
+                                       assignee.getUsername());
+        }
+
     }
 
     private void createUser() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter name");
+        String name = sc.nextLine();
+        System.out.println("Enter username");
+        String username = sc.nextLine();
+        System.out.println("Enter password");
+        String password = sc.nextLine();
+        Assignee assignee = new Assignee(assigneeRepository.getAssigneeList().size() + 1, name, username, password);
+        try {
+            assigneeRepository.saveAssignee(assignee);
+        } catch (AssigneeListFullException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

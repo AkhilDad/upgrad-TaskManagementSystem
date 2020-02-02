@@ -13,16 +13,15 @@ class MainMenu {
         processInput(username, passwd);
     }
 
-    private void processInput(String username, String passwd) {
-        if ("manager".equals(username) && "manager".equals(passwd)) {
+    private void processInput ( String username, String passwd){
+        if("manager".equals(username) && "manager".equals(passwd)){
             showMenu(OptionsMenuType.PROJECT_MANAGER);
-        }
-        else if ("assignee".equals(username) && "assignee".equals(passwd)) {
-            showMenu(OptionsMenuType.ASSIGNEE);
+        } else if ("assignee".equals(username) && "assignee".equals(passwd)){
+            showMenu (OptionsMenuType.ASSIGNEE);
         }
     }
 
-    private void showMenu(OptionsMenuType optionsMenuType) {
+    private void showMenu (OptionsMenuType optionsMenuType){
         MenuFactory.getMenuByType(optionsMenuType).showTopOptions();
     }
 
@@ -30,7 +29,7 @@ class MainMenu {
         System.exit(0);
     }
 
-    public static void main(String args[]) {
+    public static void main (String args[]){
         new MainMenu().getLoginDetails();
     }
 }
