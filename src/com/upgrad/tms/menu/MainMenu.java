@@ -11,6 +11,7 @@ import java.util.Scanner;
 class MainMenu {
     private ManagerRepository managerRepository;
     private AssigneeRepository assigneeRepository;
+    public static String loggedInUserName;
 
     public MainMenu() {
         try {
@@ -42,7 +43,9 @@ class MainMenu {
                 showMenu(OptionsMenuType.PROJECT_MANAGER);
             }
             else if (assigneeRepository.isValidCredentials(username, passwd)) {
+                loggedInUserName = username;
                 showMenu(OptionsMenuType.ASSIGNEE);
+
             } else {
                 System.out.println("Credentials are not valid. Please try again");
                 getLoginDetails();
