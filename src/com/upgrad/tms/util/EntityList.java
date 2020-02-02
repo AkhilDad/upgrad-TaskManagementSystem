@@ -1,38 +1,38 @@
 package com.upgrad.tms.util;
 
 import com.upgrad.tms.entities.Assignee;
-import com.upgrad.tms.exception.AssigneeListFullException;
+import com.upgrad.tms.exception.EntityListFullException;
 
 import java.io.Serializable;
 
-public class AssigneeList implements Serializable {
+public class EntityList<T> implements Serializable {
     private int counter;
     private int maxSize;
-    private Assignee[] assignees;
+    private Object[] assignees;
 
-    public AssigneeList () {
+    public EntityList() {
         this (10);
     }
 
-    public AssigneeList (int n) {
+    public EntityList(int n) {
         counter = 0;
         maxSize = n;
-        assignees = new Assignee[n];
+        assignees = new Object[n];
     }
 
-    public void add (Assignee assignee) throws AssigneeListFullException {
+    public void add (T assignee) throws EntityListFullException {
         if (counter < maxSize) {
             assignees[counter] = assignee;
             counter++;
         }
         else {
-            throw new AssigneeListFullException("Assignee List is full");
+            throw new EntityListFullException("Assignee List is full");
         }
     }
 
-    public Assignee get (int index) {
+    public T get (int index) {
         if (index < counter) {
-            return assignees[index];
+            return (T)assignees[index];
         }
         else {
             throw new IndexOutOfBoundsException("Index must be less than " + counter);
@@ -43,7 +43,7 @@ public class AssigneeList implements Serializable {
         return counter;
     }
 
-    public Assignee[] getAssignees() {
-        return assignees;
+    public T[] getAssignees() {
+        return (T[])assignees;
     }
 }

@@ -1,14 +1,14 @@
 package com.upgrad.tms.repository;
 
 import com.upgrad.tms.entities.Assignee;
-import com.upgrad.tms.exception.AssigneeListFullException;
-import com.upgrad.tms.util.AssigneeList;
+import com.upgrad.tms.exception.EntityListFullException;
+import com.upgrad.tms.util.EntityList;
 import com.upgrad.tms.util.Constants;
 
 import java.io.*;
 
 public class AssigneeRepository {
-    private AssigneeList assigneeList;
+    private EntityList<Assignee> assigneeList;
     private static AssigneeRepository assigneeRepository;
 
     private AssigneeRepository() throws IOException, ClassNotFoundException {
@@ -32,16 +32,16 @@ public class AssigneeRepository {
         ) {
             if (fi.available() > 0) {
                 ObjectInputStream oi = new ObjectInputStream(fi);
-                assigneeList = (AssigneeList) oi.readObject();
+                assigneeList = (EntityList<Assignee>) oi.readObject();
                 oi.close();
             }
             else {
-                assigneeList = new AssigneeList();
+                assigneeList = new EntityList<Assignee>();
             }
         }
     }
 
-    public Assignee saveAssignee(Assignee assignee) throws AssigneeListFullException, IOException {
+    public Assignee saveAssignee(Assignee assignee) throws EntityListFullException, IOException {
         assigneeList.add(assignee);
         updateListToFile();
         return assignee;
@@ -57,7 +57,7 @@ public class AssigneeRepository {
 
     }
 
-    public AssigneeList  getAssigneeList(){
+    public EntityList<Assignee> getAssigneeList(){
         return assigneeList;
     }
 
