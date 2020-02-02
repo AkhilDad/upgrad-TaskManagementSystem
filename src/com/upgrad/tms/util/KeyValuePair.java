@@ -1,19 +1,19 @@
 package com.upgrad.tms.util;
 
-public class KeyValuePair {
-    private String key;
-    private String value;
+public class KeyValuePair <K,V> {
+    private K key;
+    private V value;
 
-    public KeyValuePair (String key, String value) {
+    public KeyValuePair (K key, V value) {
         this.key = key;
         this.value = value;
     }
 
-    public String getKey () {
+    public K getKey () {
         return key;
     }
 
-    public String getValue () {
+    public V getValue () {
         return value;
     }
 }

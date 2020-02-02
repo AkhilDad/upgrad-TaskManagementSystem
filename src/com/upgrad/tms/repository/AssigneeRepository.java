@@ -6,6 +6,7 @@ import com.upgrad.tms.exception.EntityListFullException;
 
 import com.upgrad.tms.util.Constants;
 import com.upgrad.tms.util.DateUtils;
+import com.upgrad.tms.util.KeyValuePair;
 
 import java.io.*;
 import java.util.*;
@@ -98,5 +99,25 @@ public class AssigneeRepository {
             }
         }
         return filteredAssignees;
+    }
+
+    public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
+        //using priority queue and passing comparator which will check on the priority of the task
+        PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>(new Comparator<KeyValuePair<Task, String>>() {
+            @Override
+            public int compare(KeyValuePair<Task, String> firstPair, KeyValuePair<Task, String> secondPair) {
+                return firstPair.getKey().getPriority() - secondPair.getKey().getPriority();
+            }
+        });
+
+        List<Assignee> allAssignee = getAssigneeList();
+        for (int i = 0; i < allAssignee.size(); i++) {
+            Assignee assignee = allAssignee.get(i);
+            List<Task> taskList = assignee.getTaskCalendar().getTaskList();
+            for (int j = 0; j < taskList.size(); j++) {
+                priorityQueue.add(new KeyValuePair<>(taskList.get(j), assignee.getUsername()));
+            }
+        }
+        return priorityQueue;
     }
 }
