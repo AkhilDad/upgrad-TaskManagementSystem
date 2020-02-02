@@ -188,8 +188,8 @@ public class ManagerMenu implements OptionsMenu {
 
     private void createManager() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter username");
-        String username = sc.nextLine();
+
+        String username = getUserName(sc);
         System.out.println("Enter password");
         String password = sc.nextLine();
         managerRepository.saveManager(username, password);
@@ -209,12 +209,24 @@ public class ManagerMenu implements OptionsMenu {
 
     }
 
+    private String getUserName(Scanner sc){
+        System.out.println("Enter username");
+        String userName = sc.nextLine();
+        Assignee existingAssignee = assigneeRepository.getAssignee(userName);
+        if ( existingAssignee != null || managerRepository.isManager(userName)){
+            System.out.println("Username already exists.");
+            return getUserName(sc);
+        } else {
+            return userName;
+        }
+    }
+
     private void createUser() {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter name");
         String name = sc.nextLine();
-        System.out.println("Enter username");
-        String username = sc.nextLine();
+
+        String username = getUserName(sc);
         System.out.println("Enter password");
         String password = sc.nextLine();
         Assignee assignee = new Assignee(assigneeRepository.getAssigneeList().size() + 1, name, username, password);
@@ -225,8 +237,4 @@ public class ManagerMenu implements OptionsMenu {
         }
 
     }
-
-
-
-
 }

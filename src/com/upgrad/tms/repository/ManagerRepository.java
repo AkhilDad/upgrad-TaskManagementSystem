@@ -38,7 +38,7 @@ public class ManagerRepository {
         } catch (IOException e) {
             System.out.println("IO Exception handling");
             e.printStackTrace();
-        } 
+        }
     }
 
     public void saveManager(String userName, String password){
@@ -57,5 +57,9 @@ public class ManagerRepository {
 
     public boolean isValidCredentials(String username, String passwd) {
         return (managerCredentials.containsKey(username) && managerCredentials.get(username).equals(passwd));
+    }
+
+    public boolean isManager(String username){
+        return managerCredentials.containsKey(username);
     }
 }
