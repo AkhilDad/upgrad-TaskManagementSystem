@@ -1,7 +1,6 @@
 package com.upgrad.tms.menu;
 
 import com.upgrad.tms.entities.Assignee;
-
 import com.upgrad.tms.entities.Meeting;
 import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.entities.Todo;
@@ -10,27 +9,23 @@ import com.upgrad.tms.repository.ManagerRepository;
 import com.upgrad.tms.util.DateUtils;
 import com.upgrad.tms.util.TaskStatus;
 
-
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class ManagerMenu implements OptionsMenu {
 
     private AssigneeRepository assigneeRepository;
     private ManagerRepository managerRepository;
 
-    public ManagerMenu()  {
+    public ManagerMenu() {
         try {
             assigneeRepository = AssigneeRepository.getInstance();
             managerRepository = ManagerRepository.getInstance();
-        } catch (ClassNotFoundException ex){
+        } catch (ClassNotFoundException ex) {
             System.out.println("Class not found");
             System.exit(1);
-        } catch (IOException io){
+        } catch (IOException io) {
             System.out.println("io exception");
             System.exit(1);
         }
@@ -43,7 +38,7 @@ public class ManagerMenu implements OptionsMenu {
         System.out.println("2. Display all users");
         System.out.println("3. Create another manager");
         System.out.println("4. Create task and assign");
-        System.out.println("5. Get all assignees who have a task on the given date");
+        System.out.println("5. Get all unique assignees who have a task on the given date");
         System.out.println("6. Get all tasks based on priority");
         System.out.println("7. Exit");
         int choice = -1;
@@ -66,7 +61,7 @@ public class ManagerMenu implements OptionsMenu {
                 createTaskAndAssign(); //done
                 break;
             case 5:
-                getAssigneesForSpecificDate();
+                getUniqueAssigneesForSpecificDate(); //done
                 break;
             case 6:
                 getAllTasksBasedOnPriority();
@@ -84,20 +79,33 @@ public class ManagerMenu implements OptionsMenu {
     private void getAllTasksBasedOnPriority() {
     }
 
-    private void getAssigneesForSpecificDate() {
+    private void getUniqueAssigneesForSpecificDate() {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the due date for which you want to get all the users who have pending tasks");
+        Date specificDateForPendingUser = getDateFromUser(sc, DateUtils.DateFormat.DAY_MONTH_YEAR_SLASH_SEPARATED);
+        Collection<Assignee> assignees = assigneeRepository.getUniqueAssigneesForSpecificDate(specificDateForPendingUser);
+        if (assignees.isEmpty()) {
+            System.out.println("No assignees are there for the given due date");
+        }
+        for (Assignee assignee : assignees) {
+            System.out.println("Id: " + assignee.getId() + " Name: " + assignee.getName() + " UserName: " +
+                                       assignee.getUsername() + " Total tasks: " +
+                                       assignee.getTaskCalendar().getTaskList().size());
+        }
     }
 
     private void createTaskAndAssign() {
         Scanner sc = new Scanner(System.in);
         Task task;
         int taskChoice = 0;
-        while (!(taskChoice == 1 || taskChoice == 2)){
+        while (!(taskChoice == 1 || taskChoice == 2)) {
             System.out.println("Enter task type.\n 1. Todo \n 2. Meeting");
             taskChoice = sc.nextInt();
         }
-        if (taskChoice ==1){
-            task=createTodo();
-        } else {
+        if (taskChoice == 1) {
+            task = createTodo();
+        }
+        else {
             task = createMeeting();
         }
         Assignee assignee = getAssigneeForTask(sc);
@@ -110,14 +118,14 @@ public class ManagerMenu implements OptionsMenu {
         }
     }
 
-    private Assignee getAssigneeForTask ( Scanner sc){
+    private Assignee getAssigneeForTask(Scanner sc) {
         Assignee assignee = null;
         do {
             System.out.println("Enter username whom to assign task");
             String username = sc.next();
             assignee = assigneeRepository.getAssignee(username);
             if (assignee == null) {
-                System.out.println("Assignee not found for the username: "+username);
+                System.out.println("Assignee not found for the username: " + username);
             }
         } while (assignee == null);
         return assignee;
@@ -134,7 +142,7 @@ public class ManagerMenu implements OptionsMenu {
 
     }
 
-    private Task createMeeting(){
+    private Task createMeeting() {
         Scanner sc = new Scanner(System.in);
         Meeting meeting = new Meeting();
         fillTaskValues(sc, meeting);
@@ -148,7 +156,7 @@ public class ManagerMenu implements OptionsMenu {
 
     }
 
-    private void fillTaskValues ( Scanner sc, Task task){
+    private void fillTaskValues(Scanner sc, Task task) {
         System.out.print("Enter title of the task: ");
         String title = sc.nextLine();
         System.out.println("Enter priority of the task [High-Low] [1-5]: ");
@@ -166,7 +174,7 @@ public class ManagerMenu implements OptionsMenu {
     private Date getDateFromUser(Scanner sc, String dateFormat) {
         Date formattedDate = null;
         do {
-            System.out.println("Enter due date ["+ dateFormat+"]: ");
+            System.out.println("Enter due date [" + dateFormat + "]: ");
             String dueDateString = sc.nextLine();
             try {
                 formattedDate = DateUtils.getFormattedDate(dueDateString, dateFormat);
@@ -212,11 +220,13 @@ public class ManagerMenu implements OptionsMenu {
         Assignee assignee = new Assignee(assigneeRepository.getAssigneeList().size() + 1, name, username, password);
         try {
             assigneeRepository.saveAssignee(assignee);
-        } catch ( IOException e) {
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
 
     }
+
+
 
 
 }

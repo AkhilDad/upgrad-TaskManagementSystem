@@ -1,13 +1,14 @@
 package com.upgrad.tms.repository;
 
 import com.upgrad.tms.entities.Assignee;
+import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.exception.EntityListFullException;
 
 import com.upgrad.tms.util.Constants;
+import com.upgrad.tms.util.DateUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class AssigneeRepository {
     private List<Assignee> assigneeList;
@@ -80,5 +81,18 @@ public class AssigneeRepository {
             }
         }
         return null;
+    }
+
+    public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
+        Set<Assignee> filteredAssignees = new HashSet<>();
+
+        for (Assignee assignee: getAssigneeList()){
+            for ( Task task: assignee.getTaskCalendar().getTaskList()){
+                if (DateUtils.isSameDate(task.getDueDate(), specificDate)){
+                    filteredAssignees.add(assignee);
+                }
+            }
+        }
+        return filteredAssignees;
     }
 }
