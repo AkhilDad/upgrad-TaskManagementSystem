@@ -2,13 +2,15 @@ package com.upgrad.tms.repository;
 
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.exception.EntityListFullException;
-import com.upgrad.tms.util.EntityList;
+
 import com.upgrad.tms.util.Constants;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AssigneeRepository {
-    private EntityList<Assignee> assigneeList;
+    private List<Assignee> assigneeList;
     private static AssigneeRepository assigneeRepository;
 
     private AssigneeRepository() throws IOException, ClassNotFoundException {
@@ -32,16 +34,16 @@ public class AssigneeRepository {
         ) {
             if (fi.available() > 0) {
                 ObjectInputStream oi = new ObjectInputStream(fi);
-                assigneeList = (EntityList<Assignee>) oi.readObject();
+                assigneeList = (List<Assignee>) oi.readObject();
                 oi.close();
             }
             else {
-                assigneeList = new EntityList<Assignee>();
+                assigneeList = new ArrayList<Assignee>();
             }
         }
     }
 
-    public Assignee saveAssignee(Assignee assignee) throws EntityListFullException, IOException {
+    public Assignee saveAssignee(Assignee assignee) throws  IOException {
         assigneeList.add(assignee);
         updateListToFile();
         return assignee;
@@ -57,12 +59,12 @@ public class AssigneeRepository {
 
     }
 
-    public EntityList<Assignee> getAssigneeList(){
+    public List<Assignee> getAssigneeList(){
         return assigneeList;
     }
 
     public boolean isValidCredentials(String username, String passwd) {
-        for(Assignee assignee: assigneeList.getAssignees()){
+        for(Assignee assignee: assigneeList){
             if (assignee != null && assignee.getUsername().equals(username) &&
                 assignee.getPassword().equals(passwd)){
                 return true;
