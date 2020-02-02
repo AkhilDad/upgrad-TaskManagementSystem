@@ -1,7 +1,10 @@
 package com.upgrad.tms.menu;
 
 import com.upgrad.tms.entities.Assignee;
+import com.upgrad.tms.entities.Meeting;
 import com.upgrad.tms.entities.Task;
+import com.upgrad.tms.entities.Todo;
+import com.upgrad.tms.exception.NotFoundException;
 import com.upgrad.tms.repository.AssigneeRepository;
 import com.upgrad.tms.util.DateUtils;
 
@@ -36,16 +39,16 @@ class AssigneeMenu implements OptionsMenu {
 
         switch (choice) {
             case 1:
-                seeAllTasks();
+                seeAllTasks(); //done
                 break;
             case 2:
-                seeTodayTasks();
+                seeTodayTasks(); //done
                 break;
             case 3:
                 seeTaskSortedOnPriority();
                 break;
             case 4:
-                seeTaskByCategory();
+                seeTaskByCategory(); //done
                 break;
             case 5:
                 showAgain();
@@ -60,7 +63,35 @@ class AssigneeMenu implements OptionsMenu {
     }
 
     private void seeTaskByCategory() {
-        // TODO Auto-generated method stub
+        Map<String, List<Task>> listMap = new TreeMap<>();
+        List<Class<? extends Task>> classTypes = List.of( Todo.class, Meeting.class);
+        //init list for all classes there in classTypes
+        for (Class<? extends Task> classType : classTypes) {
+            listMap.put(classType.getSimpleName(), new ArrayList<>());
+        }
+
+        Assignee assignee = assigneeRepository.getAssignee(MainMenu.loggedInUserName);
+        List<Task> taskList = assignee.getTaskCalendar().getTaskList();
+        for (Task task : taskList) {
+            List<Task> taskTypeList = listMap.get(task.getClass().getSimpleName());
+            if (taskTypeList != null) {
+                taskTypeList.add(task);
+            } else {
+                throw new NotFoundException("Task type not found");
+            }
+        }
+
+        for (Map.Entry<String, List<Task>> listEntry : listMap.entrySet()) {
+            System.out.println("======= Category: " + listEntry.getKey() + " =======");
+            if (listEntry.getValue().isEmpty()) {
+                System.out.println("No task in this category");
+            }
+            for (Task task : listEntry.getValue()) {
+                task.printTaskOnConsole();
+            }
+            System.out.println("=======================");
+        }
+
 
     }
 
