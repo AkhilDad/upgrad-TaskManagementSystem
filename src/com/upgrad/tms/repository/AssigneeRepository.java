@@ -14,6 +14,8 @@ public class AssigneeRepository {
     private List<Assignee> assigneeList;
     private static AssigneeRepository assigneeRepository;
 
+    private Map<String, Assignee> assigneeMap;
+
     private AssigneeRepository() throws IOException, ClassNotFoundException {
         initAssignees();
     }
@@ -37,15 +39,22 @@ public class AssigneeRepository {
                 ObjectInputStream oi = new ObjectInputStream(fi);
                 assigneeList = (List<Assignee>) oi.readObject();
                 oi.close();
+                assigneeMap = new HashMap<>();
+                for (Assignee assignee: assigneeList){
+                    assigneeMap.put(assignee.getUsername(), assignee);
+                }
+
             }
             else {
                 assigneeList = new ArrayList<Assignee>();
+                assigneeMap = new HashMap<>();
             }
         }
     }
 
     public Assignee saveAssignee(Assignee assignee) throws  IOException {
         assigneeList.add(assignee);
+        assigneeMap.put(assignee.getUsername(), assignee);
         updateListToFile();
         return assignee;
 
@@ -75,12 +84,7 @@ public class AssigneeRepository {
     }
 
     public Assignee getAssignee(String username) {
-        for(Assignee assignee: assigneeList){
-            if (assignee != null && assignee.getUsername().equals(username) ){
-                return assignee;
-            }
-        }
-        return null;
+        return assigneeMap.get(username);
     }
 
     public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
