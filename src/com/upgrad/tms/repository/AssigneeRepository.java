@@ -72,4 +72,13 @@ public class AssigneeRepository {
         }
         return false;
     }
+
+    public Assignee getAssignee(String username) {
+        for(Assignee assignee: assigneeList){
+            if (assignee != null && assignee.getUsername().equals(username) ){
+                return assignee;
+            }
+        }
+        return null;
+    }
 }

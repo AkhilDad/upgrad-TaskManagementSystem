@@ -2,11 +2,18 @@ package com.upgrad.tms.menu;
 
 import com.upgrad.tms.entities.Assignee;
 
+import com.upgrad.tms.entities.Meeting;
+import com.upgrad.tms.entities.Task;
+import com.upgrad.tms.entities.Todo;
 import com.upgrad.tms.repository.AssigneeRepository;
 import com.upgrad.tms.repository.ManagerRepository;
+import com.upgrad.tms.util.DateUtils;
+import com.upgrad.tms.util.TaskStatus;
 
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -56,7 +63,7 @@ public class ManagerMenu implements OptionsMenu {
                 createManager();//done
                 break;
             case 4:
-                createTaskAndAssign();
+                createTaskAndAssign(); //done
                 break;
             case 5:
                 getAssigneesForSpecificDate();
@@ -81,6 +88,94 @@ public class ManagerMenu implements OptionsMenu {
     }
 
     private void createTaskAndAssign() {
+        Scanner sc = new Scanner(System.in);
+        Task task;
+        int taskChoice = 0;
+        while (!(taskChoice == 1 || taskChoice == 2)){
+            System.out.println("Enter task type.\n 1. Todo \n 2. Meeting");
+            taskChoice = sc.nextInt();
+        }
+        if (taskChoice ==1){
+            task=createTodo();
+        } else {
+            task = createMeeting();
+        }
+        Assignee assignee = getAssigneeForTask(sc);
+        task.setId((long) assignee.getTaskCalendar().getTaskList().size() + 1);
+        assignee.getTaskCalendar().add(task);
+        try {
+            assigneeRepository.updateListToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Assignee getAssigneeForTask ( Scanner sc){
+        Assignee assignee = null;
+        do {
+            System.out.println("Enter username whom to assign task");
+            String username = sc.next();
+            assignee = assigneeRepository.getAssignee(username);
+            if (assignee == null) {
+                System.out.println("Assignee not found for the username: "+username);
+            }
+        } while (assignee == null);
+        return assignee;
+
+    }
+
+    private Task createTodo() {
+        Scanner sc = new Scanner(System.in);
+        Todo todo = new Todo();
+        fillTaskValues(sc, todo);
+        System.out.print("Enter description: ");
+        todo.setDescription(sc.nextLine());
+        return todo;
+
+    }
+
+    private Task createMeeting(){
+        Scanner sc = new Scanner(System.in);
+        Meeting meeting = new Meeting();
+        fillTaskValues(sc, meeting);
+        System.out.print("Enter meeting agenda: ");
+        meeting.setAgenda(sc.nextLine());
+        System.out.print("Enter location: ");
+        meeting.setLocation(sc.nextLine());
+        System.out.print("Enter meeting url: ");
+        meeting.setUrl(sc.nextLine());
+        return meeting;
+
+    }
+
+    private void fillTaskValues ( Scanner sc, Task task){
+        System.out.print("Enter title of the task: ");
+        String title = sc.nextLine();
+        System.out.println("Enter priority of the task [High-Low] [1-5]: ");
+        int priority = sc.nextInt();
+        //Just to read \n from the previous nextInt() reading
+        sc.nextLine();
+        Date dueDate = getDateFromUser(sc, DateUtils.DateFormat.DAY_MONTH_YEAR_HOUR_MIN_SLASH_SEPARATED);
+        task.setTitle(title);
+        task.setPriority(priority);
+        task.setDueDate(dueDate);
+        task.setStatus(TaskStatus.PENDING);
+
+    }
+
+    private Date getDateFromUser(Scanner sc, String dateFormat) {
+        Date formattedDate = null;
+        do {
+            System.out.println("Enter due date ["+ dateFormat+"]: ");
+            String dueDateString = sc.nextLine();
+            try {
+                formattedDate = DateUtils.getFormattedDate(dueDateString, dateFormat);
+            } catch (ParseException e) {
+                System.out.println("Wrong date format, Please enter correct date");
+            }
+        } while (formattedDate == null);
+        return formattedDate;
+
     }
 
     private void createManager() {
@@ -122,4 +217,6 @@ public class ManagerMenu implements OptionsMenu {
         }
 
     }
+
+
 }

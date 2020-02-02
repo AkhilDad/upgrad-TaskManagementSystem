@@ -8,14 +8,23 @@ public class Assignee implements Serializable {
     private String username;
     private String password;
     private static final long serialVersionUID=1L;
+    private Calendar<Task> taskCalendar;
 
     public Assignee(long id, String name, String username, String password) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.password = password;
+        taskCalendar = new Calendar<>();
     }
 
+    public Calendar<Task> getTaskCalendar() {
+        return taskCalendar;
+    }
+
+    public void setTaskCalendar(Calendar<Task> taskCalendar) {
+        this.taskCalendar = taskCalendar;
+    }
 
     public long getId() {
         return id;
