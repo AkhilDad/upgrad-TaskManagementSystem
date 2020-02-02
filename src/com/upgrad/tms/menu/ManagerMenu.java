@@ -17,7 +17,7 @@ class ManagerMenu implements OptionsMenu {
         int choice = -1;
         try {
             choice = sc.nextInt();
-        } catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println("Wrong input type; only numbers are allowed. Please enter again");
         }
         switch (choice) {

@@ -1,11 +1,12 @@
 package com.upgrad.tms.menu;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 class AssigneeMenu implements OptionsMenu {
 
     @Override
-    public void showTopOptions() {
+    public void showTopOptions() throws InputMismatchException {
         Scanner sc = new Scanner(System.in);
         System.out.println("1. See all tasks");
         System.out.println("2. See Today's Task");
@@ -14,12 +15,9 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("5. Change task status");
         System.out.println("6. Exit");
         int choice = 0;
-        try {
-            choice = sc.nextInt();
-        } catch (InputMismatchException e) {
-            System.out.println("Wrong input type, In input only numbers are allowed");
-            showTopOptions();
-        }
+
+        choice = sc.nextInt();
+
 
         switch (choice) {
             case 1:
