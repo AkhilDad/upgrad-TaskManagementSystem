@@ -4,18 +4,19 @@ import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.repository.AssigneeRepository;
 import com.upgrad.tms.util.TaskStatus;
 
-public class TaskWorker extends AbstractTaskWorker {
+import java.io.IOException;
 
-    private Task task;
+public abstract class AbstractTaskWorker implements Runnable {
+
     private AssigneeRepository assigneeRepository;
 
-    public TaskWorker(Task task, AssigneeRepository assigneeRepository) {
-        super(assigneeRepository);
-        this.task = task;
+    public AbstractTaskWorker(AssigneeRepository assigneeRepository) {
         this.assigneeRepository = assigneeRepository;
     }
 
-    public void doWork() {
+    public abstract void doWork();
+
+    public void processTask(Task task) {
         //already return the task if already done
         if (task.getTaskStatus() == TaskStatus.DONE) {
             return;
@@ -32,11 +33,17 @@ public class TaskWorker extends AbstractTaskWorker {
         }
         System.out.println("Time: " + System.currentTimeMillis() + " Completing task with id and title" + task.getId() + ": " + task.getTitle());
         task.setStatus(TaskStatus.DONE);
-        updateInFile();
     }
 
-    @Override
-    public void run() {
-        doWork();
+    public void updateInFile() {
+        try {
+            System.out.println("updateInFile(): updating list to the file ");
+            assigneeRepository.updateListToFile();
+            System.out.println("updating list to the file is done");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println("exiting updateInFile()");
+        }
     }
 }
