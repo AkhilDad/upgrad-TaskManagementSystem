@@ -74,7 +74,7 @@ class AssigneeMenu implements OptionsMenu {
         } while (task == null);
 
         //Create a new thread and start it
-        Thread thread = new TaskWorker(task, assigneeRepository);
+        Thread thread = new Thread(new TaskWorker(task, assigneeRepository));
         thread.start();
     }
 
