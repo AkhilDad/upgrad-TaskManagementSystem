@@ -40,9 +40,7 @@ public class AssigneeRepository {
                 assigneeList = (List<Assignee>) oi.readObject();
                 oi.close();
                 assigneeMap = new HashMap<>();
-                assigneeList.forEach(assignee -> {
-                    assigneeMap.put(assignee.getUsername(), assignee);
-                });
+                assigneeList.forEach(assignee -> assigneeMap.put(assignee.getUsername(), assignee));
             }
             else {
                 assigneeList = new ArrayList<Assignee>();
