@@ -1,5 +1,7 @@
 package com.upgrad.tms.repository;
 
+import com.upgrad.tms.administration.ConceptsLearned;
+import com.upgrad.tms.administration.ConceptsLearned.DifficultyLevel;
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.entities.Task;
 
@@ -62,6 +64,7 @@ public class AssigneeRepository {
      * In this method learned the concepts IOException, FileReadWrite, ObjectInputStream
      * @throws IOException
      */
+    @ConceptsLearned(concepts = {"IOException", "FileReadWrite", "ObjectInputStream"})
     public void updateListToFile() throws IOException {
         try (
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(Constants.ASSIGNEE_FILE_NAME));
@@ -90,6 +93,7 @@ public class AssigneeRepository {
      * @param username
      * @return
      */
+    @ConceptsLearned(concepts = {"Map"}, difficulty = DifficultyLevel.EASY)
     public Assignee getAssignee(String username) {
         return assigneeMap.get(username);
     }
@@ -99,6 +103,7 @@ public class AssigneeRepository {
      * @param specificDate
      * @return
      */
+    @ConceptsLearned(concepts = {"Streams", "filter", "HashSet", "Collect","anyMatch"}, difficulty = DifficultyLevel.DIFFICULT)
     public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
         return assigneeList.stream()
                 .filter(assignee -> assignee.getTaskCalendar().getTaskList().stream()
@@ -110,6 +115,7 @@ public class AssigneeRepository {
      * Concepts learned in this is PriorityQueue
      * @return
      */
+    @ConceptsLearned(concepts = {"PriorityQueue", "List"})
     public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
         //using priority queue and passing comparator which will check on the priority of the task
         PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(firstPair -> firstPair.getKey().getPriority()));
