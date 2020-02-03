@@ -86,16 +86,10 @@ public class AssigneeRepository {
     }
 
     public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
-        Set<Assignee> filteredAssignees = new HashSet<>();
-
-        for (Assignee assignee: getAssigneeList()){
-            for ( Task task: assignee.getTaskCalendar().getTaskList()){
-                if (DateUtils.isSameDate(task.getDueDate(), specificDate)){
-                    filteredAssignees.add(assignee);
-                }
-            }
-        }
-        return filteredAssignees;
+        return assigneeList.stream()
+                .filter(assignee -> assignee.getTaskCalendar().getTaskList().stream()
+                        .anyMatch(task -> DateUtils.isSameDate(task.getDueDate(), specificDate)))
+                .collect(Collectors.toSet());
     }
 
     public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
