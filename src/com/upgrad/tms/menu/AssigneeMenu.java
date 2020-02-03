@@ -63,18 +63,20 @@ class AssigneeMenu implements OptionsMenu {
         showTopOptions();
     }
 
-        private void changeTaskStatus() {
-            Scanner sc = new Scanner(System.in);
-            Task task = null;
-            long taskId = 0;
-            do {
-                System.out.println("Enter the task id to complete: ");
-                taskId = sc.nextLong();
-                task = assigneeRepository.getTaskById(taskId);
-            } while (task == null);
+    private void changeTaskStatus() {
+        Scanner sc = new Scanner(System.in);
+        Task task = null;
+        long taskId = 0;
+        do {
+            System.out.println("Enter the task id to complete: ");
+            taskId = sc.nextLong();
+            task = assigneeRepository.getTaskById(taskId);
+        } while (task == null);
 
-            new TaskWorker(task, assigneeRepository).doWork();
-        }
+        //Create a new thread and start it
+        Thread thread = new TaskWorker(task, assigneeRepository);
+        thread.start();
+    }
 
     private void seeTaskByCategory() {
         Map<String, List<Task>> listMap = new TreeMap<>();

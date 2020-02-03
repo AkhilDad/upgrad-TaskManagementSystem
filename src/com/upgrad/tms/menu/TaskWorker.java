@@ -6,7 +6,7 @@ import com.upgrad.tms.util.TaskStatus;
 
 import java.io.IOException;
 
-public class TaskWorker {
+public class TaskWorker extends Thread {
 
     private Task task;
     private AssigneeRepository assigneeRepository;
@@ -46,5 +46,11 @@ public class TaskWorker {
         } finally {
            System.out.println("exiting updateInFile()");
         }
+    }
+
+    @Override
+    public void run() {
+        super.run();
+        doWork();
     }
 }
