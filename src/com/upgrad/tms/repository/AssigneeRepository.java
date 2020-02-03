@@ -58,6 +58,10 @@ public class AssigneeRepository {
 
     }
 
+    /**
+     * In this method learned the concepts IOException, FileReadWrite, ObjectInputStream
+     * @throws IOException
+     */
     public void updateListToFile() throws IOException {
         try (
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(Constants.ASSIGNEE_FILE_NAME));
@@ -81,10 +85,20 @@ public class AssigneeRepository {
         return false;
     }
 
+    /**
+     * Concepts learned in this is Map, Getting Value in o(1)
+     * @param username
+     * @return
+     */
     public Assignee getAssignee(String username) {
         return assigneeMap.get(username);
     }
 
+    /**
+     * Concepts learned in this is Streams, filter, HashSet, Collect anyMatch
+     * @param specificDate
+     * @return
+     */
     public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
         return assigneeList.stream()
                 .filter(assignee -> assignee.getTaskCalendar().getTaskList().stream()
@@ -92,6 +106,10 @@ public class AssigneeRepository {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Concepts learned in this is PriorityQueue
+     * @return
+     */
     public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
         //using priority queue and passing comparator which will check on the priority of the task
         PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(firstPair -> firstPair.getKey().getPriority()));
