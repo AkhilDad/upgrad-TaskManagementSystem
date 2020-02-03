@@ -94,7 +94,7 @@ public class AssigneeRepository {
 
     public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
         //using priority queue and passing comparator which will check on the priority of the task
-        PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>((firstPair, secondPair) -> firstPair.getKey().getPriority() - secondPair.getKey().getPriority());
+        PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(firstPair -> firstPair.getKey().getPriority()));
 
         List<Assignee> allAssignee = getAssigneeList();
         for (int i = 0; i < allAssignee.size(); i++) {
