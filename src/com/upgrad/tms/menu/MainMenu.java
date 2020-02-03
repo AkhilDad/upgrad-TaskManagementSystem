@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-class MainMenu {
+public class MainMenu {
     private ManagerRepository managerRepository;
     private AssigneeRepository assigneeRepository;
     public static String loggedInUserName;

@@ -5,6 +5,7 @@ import com.upgrad.tms.administration.ConceptsLearned.DifficultyLevel;
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.entities.Task;
 
+import com.upgrad.tms.menu.MainMenu;
 import com.upgrad.tms.util.Constants;
 import com.upgrad.tms.util.DateUtils;
 import com.upgrad.tms.util.KeyValuePair;
@@ -129,5 +130,14 @@ public class AssigneeRepository {
             }
         }
         return priorityQueue;
+    }
+
+    public Task getTaskById(Long taskId) {
+        if (MainMenu.loggedInUserName != null) {
+            Assignee assignee = assigneeMap.get(MainMenu.loggedInUserName);
+            Optional<Task> first = assignee.getTaskCalendar().getTaskList().stream().filter(task -> task.getId().equals(taskId)).findFirst();
+            return first.orElse(null);
+        }
+        return null;
     }
 }
