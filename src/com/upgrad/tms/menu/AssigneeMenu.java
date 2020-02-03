@@ -10,6 +10,7 @@ import com.upgrad.tms.util.DateUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 class AssigneeMenu implements OptionsMenu {
     private AssigneeRepository assigneeRepository;
@@ -119,13 +120,9 @@ class AssigneeMenu implements OptionsMenu {
     private void seeTodayTasks() {
         if (MainMenu.loggedInUserName != null) {
             Assignee assignee = assigneeRepository.getAssignee(MainMenu.loggedInUserName);
-            List<Task> taskList = assignee.getTaskCalendar().getTaskList();
-            List<Task> todayTaskList = new ArrayList<>();
-            for (Task task : taskList) {
-                if (DateUtils.isSameDate(task.getDueDate(), Calendar.getInstance().getTime())) {
-                    todayTaskList.add(task);
-                }
-            }
+            List<Task> todayTaskList = assignee.getTaskCalendar().getTaskList().stream()
+                    .filter(task -> DateUtils.isSameDate(task.getDueDate(), Calendar.getInstance().getTime()))
+                    .collect(Collectors.toList());
             if (todayTaskList.isEmpty()) {
                 System.out.println("Hurray! No task for today");
             } else {
