@@ -2,7 +2,6 @@ package com.upgrad.tms.repository;
 
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.entities.Task;
-import com.upgrad.tms.exception.EntityListFullException;
 
 import com.upgrad.tms.util.Constants;
 import com.upgrad.tms.util.DateUtils;
@@ -41,10 +40,9 @@ public class AssigneeRepository {
                 assigneeList = (List<Assignee>) oi.readObject();
                 oi.close();
                 assigneeMap = new HashMap<>();
-                for (Assignee assignee: assigneeList){
+                assigneeList.forEach(assignee -> {
                     assigneeMap.put(assignee.getUsername(), assignee);
-                }
-
+                });
             }
             else {
                 assigneeList = new ArrayList<Assignee>();
