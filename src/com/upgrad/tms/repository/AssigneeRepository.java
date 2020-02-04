@@ -85,6 +85,11 @@ public class AssigneeRepository {
         return assigneeMap.get(username);
     }
 
+    /**
+     * In this method we have learned about streams, filter, anyMatch, Collectors and Set
+     * @param specificDate
+     * @return
+     */
     public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
         return assigneeList.stream()
                 .filter(assignee -> assignee.getTaskCalendar().getTaskList().stream()
@@ -92,6 +97,10 @@ public class AssigneeRepository {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * This method we have learned PriorityQueue
+     * @return
+     */
     public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
         //using priority queue and passing comparator which will check on the priority of the task
         PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(firstPair -> firstPair.getKey().getPriority()));
