@@ -32,7 +32,8 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("3. See Task sorted on priority");
         System.out.println("4. Tasks by task category");
         System.out.println("5. Change task status");
-        System.out.println("6. Exit");
+        System.out.println("6. Change multiple task status together");
+        System.out.println("7. Exit");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -55,12 +56,35 @@ class AssigneeMenu implements OptionsMenu {
                 changeTaskStatus();
                 break;
             case 6:
+                changeMultipleTaskStatus();
+                break;
+            case 7:
                 MainMenu.exit();
                 break;
             default:
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void changeMultipleTaskStatus() {
+        long taskId = 0;
+        Scanner sc = new Scanner(System.in);
+        List<Task> taskList = new ArrayList<>();
+        Task task = null;
+        do {
+            System.out.println("Enter the task id to complete or -1 to process the already added: ");
+            taskId = sc.nextLong();
+            if (taskId != -1) {
+                task = assigneeRepository.getTaskById(taskId);
+                if (task == null) {
+                    System.out.println("Task not found for id: "+taskId);
+                } else {
+                    taskList.add(task);
+                }
+            }
+        } while (taskId != -1);
+        new CompositeWorker(taskList, assigneeRepository).start();
     }
 
     private void changeTaskStatus() {
