@@ -1,5 +1,6 @@
 package com.upgrad.tms.repository;
 
+import com.upgrad.tms.administration.ConceptsLearned;
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.entities.Task;
 
@@ -90,6 +91,7 @@ public class AssigneeRepository {
      * @param specificDate
      * @return
      */
+    @ConceptsLearned(concepts = {"Stream", "filter", "anyMatch", "Collectors", "Set"}, difficultyLevel = ConceptsLearned.DifficultyLevel.HARD)
     public Collection<Assignee> getUniqueAssigneesForSpecificDate(Date specificDate){
         return assigneeList.stream()
                 .filter(assignee -> assignee.getTaskCalendar().getTaskList().stream()
@@ -101,6 +103,7 @@ public class AssigneeRepository {
      * This method we have learned PriorityQueue
      * @return
      */
+    @ConceptsLearned(concepts = {"PriorityQueue"})
     public PriorityQueue<KeyValuePair<Task, String>> getAllTaskAssigneePairByPriority(){
         //using priority queue and passing comparator which will check on the priority of the task
         PriorityQueue<KeyValuePair<Task, String>> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(firstPair -> firstPair.getKey().getPriority()));
