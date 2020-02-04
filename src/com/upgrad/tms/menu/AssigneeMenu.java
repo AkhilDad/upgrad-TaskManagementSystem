@@ -52,7 +52,7 @@ class AssigneeMenu implements OptionsMenu {
                 seeTaskByCategory(); //done
                 break;
             case 5:
-                showAgain();
+                changeTaskStatus();
                 break;
             case 6:
                 MainMenu.exit();
@@ -61,6 +61,18 @@ class AssigneeMenu implements OptionsMenu {
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void changeTaskStatus() {
+        Scanner sc = new Scanner(System.in);
+        Task task = null;
+        long taskId = 0;
+        do {
+            System.out.println("Enter the task id to complete: ");
+            taskId = sc.nextLong();
+            task = assigneeRepository.getTaskById(taskId);
+        } while (task == null);
+        new TaskWorker(task, assigneeRepository).start();
     }
 
     @Override
