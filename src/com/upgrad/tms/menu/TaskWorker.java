@@ -13,6 +13,7 @@ public class TaskWorker extends AbstractWorker implements Runnable {
     }
 
     public void doWork() {
+        System.out.println("Task Id: "+task.getId()+" Current Thread priority: "+Thread.currentThread().getPriority());
         processTask(task);
         updateInFile();
     }
