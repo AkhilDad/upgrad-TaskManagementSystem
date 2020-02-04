@@ -18,6 +18,11 @@ public abstract class AbstractWorker {
 
     protected void processTask(Task task) {
         if (task.getTaskStatus() == TaskStatus.DONE) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             return;
         }
         System.out.println("Starting Time: "+System.currentTimeMillis()+ " Task Id: "+task.getId()+ " Task Title: "+task.getTitle());

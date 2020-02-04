@@ -97,8 +97,13 @@ class AssigneeMenu implements OptionsMenu {
             taskId = sc.nextLong();
             task = assigneeRepository.getTaskById(taskId);
         } while (task == null);
+        Thread currentThread = Thread.currentThread();
+        System.out.println(currentThread);
         Thread thread = new Thread(new TaskWorker(task, assigneeRepository));
+        boolean alive = thread.isAlive();
+        System.out.println("Another Thread: "+thread+" isAlive: "+alive);
         thread.start();
+        System.out.println("Thread is Alive after starting: "+thread.isAlive());
     }
 
     @Override
