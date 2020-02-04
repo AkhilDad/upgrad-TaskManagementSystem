@@ -103,7 +103,12 @@ class AssigneeMenu implements OptionsMenu {
         boolean alive = thread.isAlive();
         System.out.println("Another Thread: "+thread+" isAlive: "+alive);
         thread.start();
-        System.out.println("Thread is Alive after starting: "+thread.isAlive());
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Thread is Alive after starting and calling join on it: "+thread.isAlive());
     }
 
     @Override
