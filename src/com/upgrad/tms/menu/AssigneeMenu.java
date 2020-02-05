@@ -33,7 +33,8 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("4. Tasks by task category");
         System.out.println("5. Change task status");
         System.out.println("6. Change multiple task status together");
-        System.out.println("7. Exit");
+        System.out.println("7. See Task sorted on priority");
+        System.out.println("8. Exit");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -59,12 +60,19 @@ class AssigneeMenu implements OptionsMenu {
                 changeMultipleTaskStatus();
                 break;
             case 7:
+                callParentChild();
+                break;
+            case 8:
                 MainMenu.exit();
                 break;
             default:
                 wrongInput();
         }
 //        showTopOptions();
+    }
+
+    private void callParentChild() {
+
     }
 
     private void changeMultipleTaskStatus() {
