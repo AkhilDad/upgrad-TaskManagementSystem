@@ -64,7 +64,7 @@ class AssigneeMenu implements OptionsMenu {
             default:
                 wrongInput();
         }
-        showTopOptions();
+//        showTopOptions();
     }
 
     private void changeMultipleTaskStatus() {
@@ -106,7 +106,10 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("Current thread: "+currentThread.getName());
         Thread thread = new Thread(new TaskWorker(task, assigneeRepository));
         System.out.println("User Thread: "+thread.getName());
+        thread.setDaemon(true);
         thread.start();
+        System.out.println("isDaemon: "+thread.isDaemon());
+        System.out.println("Main thread isDaemon: "+currentThread.isDaemon());
     }
 
     @Override
