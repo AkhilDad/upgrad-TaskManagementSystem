@@ -64,7 +64,7 @@ class AssigneeMenu implements OptionsMenu {
             default:
                 wrongInput();
         }
-        showTopOptions();
+//        showTopOptions();
     }
 
     private void changeMultipleTaskStatus() {
@@ -111,12 +111,8 @@ class AssigneeMenu implements OptionsMenu {
         Thread thread = new Thread(new TaskWorker(task, assigneeRepository));
         boolean alive = thread.isAlive();
         System.out.println("Another Thread: "+thread+" isAlive: "+alive);
+        thread.setDaemon(true);
         thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         System.out.println("Thread is Alive after starting and calling join on it: "+thread.isAlive());
     }
 
