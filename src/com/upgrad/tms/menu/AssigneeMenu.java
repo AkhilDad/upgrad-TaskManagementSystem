@@ -107,7 +107,14 @@ class AssigneeMenu implements OptionsMenu {
         Thread thread = new Thread(new TaskWorker(task, assigneeRepository));
         System.out.println("User Thread: "+thread.getName());
         thread.setDaemon(true);
+        System.out.println("User thread: isAlive: "+thread.isAlive());
         thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("User thread: isAlive: "+thread.isAlive());
         System.out.println("isDaemon: "+thread.isDaemon());
         System.out.println("Main thread isDaemon: "+currentThread.isDaemon());
     }
