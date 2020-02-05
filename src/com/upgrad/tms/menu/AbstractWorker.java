@@ -18,6 +18,12 @@ public abstract class AbstractWorker {
 
     protected void processTask(Task task) {
         if (task.getTaskStatus() == TaskStatus.DONE) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Task id: "+task.getId()+ " Current thread priority: "+Thread.currentThread().getPriority());
             return;
         }
         System.out.println("Starting Time: "+System.currentTimeMillis()+ " Task Id: "+task.getId()+ " Task Title: "+task.getTitle());
@@ -27,6 +33,7 @@ public abstract class AbstractWorker {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("Task id: "+task.getId()+ " Current thread priority: "+Thread.currentThread().getPriority());
         System.out.println("Completing Time: "+System.currentTimeMillis()+ " Task Id: "+task.getId()+ " Task Title: "+task.getTitle());
         task.setStatus(TaskStatus.DONE);
     }

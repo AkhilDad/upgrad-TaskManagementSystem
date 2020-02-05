@@ -84,8 +84,13 @@ class AssigneeMenu implements OptionsMenu {
                 }
             }
         } while (taskId != -1);
-        Thread thread = new Thread(new CompositeWorker(taskList, assigneeRepository));
-        thread.start();
+        List<Thread> threadList = new ArrayList<>(taskList.size());
+        for (Task taskItem: taskList) {
+            Thread thread = new Thread(new TaskWorker(taskItem, assigneeRepository));
+            thread.setPriority(Thread.MAX_PRIORITY - taskItem.getPriority());
+            threadList.add(thread);
+        }
+        threadList.forEach(Thread::start);
     }
 
     private void changeTaskStatus() {
