@@ -15,25 +15,22 @@ public class MeetingLocationUrlWorker implements Runnable {
     }
     @Override
     public void run() {
-        {
-            System.out.println("Processing meeting id "+meeting.getId());
-            synchronized (locationLocator) {
+        System.out.println("Processing meeting id " + meeting.getId());
+        synchronized (locationLocator) {
+            synchronized (urlLocator) {
+                System.out.println("Processing meeting id after locks " + meeting.getId());
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Detailed location: "+locationLocator.getLocationDetails(meeting.getLocation()));
-                System.out.println("Getting url locator");
-                synchronized (urlLocator) {
-                    System.out.println("Got url locator");
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("Detailed url: "+urlLocator.getUrlDetails(meeting.getUrl()));
+                System.out.println("Detailed location: " + locationLocator.getLocationDetails(meeting.getLocation()));
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                System.out.println("Detailed url: " + urlLocator.getUrlDetails(meeting.getUrl()));
             }
         }
     }
