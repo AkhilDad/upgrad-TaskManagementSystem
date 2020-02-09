@@ -6,6 +6,10 @@ import com.upgrad.tms.entities.Meeting;
 import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.entities.Todo;
 import com.upgrad.tms.exception.NotFoundException;
+import com.upgrad.tms.meeting.LocationLocator;
+import com.upgrad.tms.meeting.MeetingLocationUrlWorker;
+import com.upgrad.tms.meeting.MeetingUrlLocationWorker;
+import com.upgrad.tms.meeting.UrlLocator;
 import com.upgrad.tms.priority.PriorityChildWorker;
 import com.upgrad.tms.priority.PriorityParentWorker;
 import com.upgrad.tms.priority.ShareObject;
@@ -29,6 +33,11 @@ class AssigneeMenu implements OptionsMenu {
             e.printStackTrace();
         }
     }
+
+    private static boolean isMeeting(Task task) {
+        return task instanceof Meeting;
+    }
+
     @Override
     public void showTopOptions() throws InputMismatchException {
         Scanner sc = new Scanner(System.in);
@@ -39,8 +48,9 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("5. Change task status");
         System.out.println("6. Change multiple task status together");
         System.out.println("7. Run task according to the priority");
-        System.out.println("8. Exit");
-        System.out.println("9. Change all task status to pending");
+        System.out.println("8. Print location and url details for meetings");
+        System.out.println("9. Exit");
+        System.out.println("10. Change all task status to pending");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -69,15 +79,34 @@ class AssigneeMenu implements OptionsMenu {
                 runTaskAccordingToPriority();
                 break;
             case 8:
-                MainMenu.exit();
+                printUrlAndLocationDetails();
                 break;
             case 9:
+                MainMenu.exit();
+                break;
+            case 10:
                 changeTaskStatusToPending();
                 break;
             default:
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void printUrlAndLocationDetails() {
+        List<Task> taskList = assigneeRepository.getAssignee(MainMenu.loggedInUserName).getTaskCalendar()
+                .getTaskList().stream().filter(AssigneeMenu::isMeeting).collect(Collectors.toList());
+        List<Thread>  threads = new ArrayList<>(taskList.size());
+        LocationLocator locationLocator = LocationLocator.getInstance();
+        UrlLocator urlLocator = UrlLocator.getInstance();
+        for (int i = 0; i < taskList.size(); i++) {
+            if (i % 2 == 0) {
+                threads.add(new Thread(new MeetingLocationUrlWorker((Meeting) taskList.get(i), locationLocator, urlLocator)));
+            } else {
+                threads.add(new Thread(new MeetingUrlLocationWorker((Meeting) taskList.get(i), locationLocator, urlLocator)));
+            }
+        }
+        threads.forEach(Thread::start);
     }
 
     private void runTaskAccordingToPriority() {
