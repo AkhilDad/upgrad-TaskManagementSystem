@@ -19,6 +19,7 @@ import com.upgrad.tms.util.TaskStatus;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 class AssigneeMenu implements OptionsMenu {
@@ -99,11 +100,12 @@ class AssigneeMenu implements OptionsMenu {
         List<Thread>  threads = new ArrayList<>(taskList.size());
         LocationLocator locationLocator = LocationLocator.getInstance();
         UrlLocator urlLocator = UrlLocator.getInstance();
+        Semaphore semaphore = new Semaphore(1);
         for (int i = 0; i < taskList.size(); i++) {
             if (i % 2 == 0) {
-                threads.add(new Thread(new MeetingLocationUrlWorker((Meeting) taskList.get(i), locationLocator, urlLocator)));
+                threads.add(new Thread(new MeetingLocationUrlWorker((Meeting) taskList.get(i), locationLocator, urlLocator, semaphore)));
             } else {
-                threads.add(new Thread(new MeetingUrlLocationWorker((Meeting) taskList.get(i), locationLocator, urlLocator)));
+                threads.add(new Thread(new MeetingUrlLocationWorker((Meeting) taskList.get(i), locationLocator, urlLocator, semaphore)));
             }
         }
         threads.forEach(Thread::start);
