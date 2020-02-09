@@ -12,6 +12,7 @@ import com.upgrad.tms.meeting.LocationLocator;
 import com.upgrad.tms.meeting.MeetingLocationUrlWorker;
 import com.upgrad.tms.meeting.MeetingUrlLocationWorker;
 import com.upgrad.tms.meeting.UrlLocator;
+import com.upgrad.tms.phaser.PhaserTaskWorker;
 import com.upgrad.tms.priority.PriorityChildWorker;
 import com.upgrad.tms.priority.PriorityParentWorker;
 import com.upgrad.tms.priority.ShareObject;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
@@ -55,8 +57,9 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("7. Run task according to the priority");
         System.out.println("8. Print location and url details for meetings");
         System.out.println("9. Change parent tas status after multiple child task are done");
-        System.out.println("10. Exit");
-        System.out.println("11. Change all task status to pending");
+        System.out.println("10. Run all tasks in phases");
+        System.out.println("11. Exit");
+        System.out.println("12. Change all task status to pending");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -91,15 +94,33 @@ class AssigneeMenu implements OptionsMenu {
                 changeParentTaskStatusAfterChild();
                 break;
             case 10:
-                MainMenu.exit();
+                runTasksInPhases();
                 break;
             case 11:
+                MainMenu.exit();
+                break;
+            case 12:
                 changeTaskStatusToPending();
                 break;
             default:
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void runTasksInPhases() {
+        List<Task> multipleTask = getMultipleTask();
+        Phaser phaser = new Phaser(multipleTask.size());
+        List<Thread> threadList = multipleTask.stream().map(task -> new Thread(new PhaserTaskWorker(task, assigneeRepository, phaser))).collect(Collectors.toList());
+        for (Thread thread : threadList) {
+            thread.start();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     private void changeParentTaskStatusAfterChild() {
