@@ -4,21 +4,33 @@ import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.menu.AbstractWorker;
 import com.upgrad.tms.repository.AssigneeRepository;
 
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 
 public class ChildWorker extends AbstractWorker implements Runnable {
 
     private final CountDownLatch countDownLatch;
     private final Task task;
+    private CyclicBarrier cyclicBarrier;
 
-    public ChildWorker(AssigneeRepository assigneeRepository, Task task, CountDownLatch countDownLatch) {
+    public ChildWorker(AssigneeRepository assigneeRepository, Task task, CountDownLatch countDownLatch, CyclicBarrier cyclicBarrier) {
         super(assigneeRepository);
         this.countDownLatch = countDownLatch;
         this.task = task;
+        this.cyclicBarrier = cyclicBarrier;
     }
 
     @Override
     public void doWork() {
+        System.out.println("Cyclic barrier total parties: "+cyclicBarrier.getParties()+" Waiting parties: "+cyclicBarrier.getNumberWaiting()+" Child worker starting for task: "+task.getId());
+        try {
+            cyclicBarrier.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
         processTask(task);
         updateInFile();
         countDownLatch.countDown();
