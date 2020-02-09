@@ -188,13 +188,10 @@ class AssigneeMenu implements OptionsMenu {
 
     private void changeMultipleTaskStatus() {
         List<Task> taskList = getMultipleTask();
-        List<Thread> threadList = new ArrayList<>(taskList.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
         for (Task taskItem: taskList) {
-            Thread thread = new Thread(new TaskWorker(taskItem, assigneeRepository));
-            thread.setPriority(Thread.MAX_PRIORITY - taskItem.getPriority());
-            threadList.add(thread);
+            executorService.execute(new TaskWorker(taskItem, assigneeRepository));
         }
-        threadList.forEach(Thread::start);
     }
 
     private List<Task> getMultipleTask() {
