@@ -188,9 +188,18 @@ class AssigneeMenu implements OptionsMenu {
     private void changeMultipleTaskStatus() {
         List<Task> taskList = getMultipleTask();
         ExecutorService service = Executors.newFixedThreadPool(2);
+        int totalTaskCount = 0;
         for (Task taskItem: taskList) {
-            service.execute(new TaskWorker(taskItem, assigneeRepository));
+            Future<Integer> submit = service.submit(new TaskWorker(taskItem, assigneeRepository));
+            try {
+                totalTaskCount = totalTaskCount + submit.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
+        System.out.println("Total task actually done: "+totalTaskCount);
     }
 
     private List<Task> getMultipleTask() {
@@ -224,7 +233,9 @@ class AssigneeMenu implements OptionsMenu {
         } while (task == null);
         Thread currentThread = Thread.currentThread();
         System.out.println("Current thread: "+currentThread.getName());
-        Thread thread = new Thread(new TaskWorker(task, assigneeRepository));
+        TaskWorker taskWorker = new TaskWorker(task, assigneeRepository);
+        FutureTask<Integer> futureTask = new FutureTask<>(taskWorker);
+        Thread thread = new Thread(futureTask);
         System.out.println("User Thread: "+thread.getName());
         thread.setDaemon(true);
         System.out.println("User thread: isAlive: "+thread.isAlive());
