@@ -60,11 +60,13 @@ public class AssigneeRepository {
 
     }
 
-    public void updateListToFile() throws IOException {
+    public synchronized void updateListToFile() throws IOException {
         try (
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(Constants.ASSIGNEE_FILE_NAME));
                 ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream)) {
+            System.out.println("Writing in the file started by thread: "+Thread.currentThread().getName());
             outputStream.writeObject(assigneeList);
+            System.out.println("Writing in the file completed by thread: "+Thread.currentThread().getName());
         }
 
     }
