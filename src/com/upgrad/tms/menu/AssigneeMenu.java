@@ -1,6 +1,8 @@
 package com.upgrad.tms.menu;
 
 import com.sun.tools.javac.Main;
+import com.upgrad.tms.countdownlatch.ChildWorker;
+import com.upgrad.tms.countdownlatch.ParentWorker;
 import com.upgrad.tms.entities.Assignee;
 import com.upgrad.tms.entities.Meeting;
 import com.upgrad.tms.entities.Task;
@@ -19,6 +21,7 @@ import com.upgrad.tms.util.TaskStatus;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
@@ -50,8 +53,9 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("6. Change multiple task status together");
         System.out.println("7. Run task according to the priority");
         System.out.println("8. Print location and url details for meetings");
-        System.out.println("9. Exit");
-        System.out.println("10. Change all task status to pending");
+        System.out.println("9. Change parent tas status after multiple child task are done");
+        System.out.println("10. Exit");
+        System.out.println("11. Change all task status to pending");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -83,15 +87,31 @@ class AssigneeMenu implements OptionsMenu {
                 printUrlAndLocationDetails();
                 break;
             case 9:
-                MainMenu.exit();
+                changeParentTaskStatusAfterChild();
                 break;
             case 10:
+                MainMenu.exit();
+                break;
+            case 11:
                 changeTaskStatusToPending();
                 break;
             default:
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void changeParentTaskStatusAfterChild() {
+        List<Task> multipleTask = getMultipleTask();
+        if (multipleTask.size() > 2) {
+            CountDownLatch countDownLatch = new CountDownLatch(multipleTask.size()- 1);
+            Thread thread = new Thread(new ParentWorker(assigneeRepository, countDownLatch, multipleTask.get(0)));
+            thread.start();
+            for (int i = 1; i < multipleTask.size(); i++) {
+                new Thread(new ChildWorker(assigneeRepository, multipleTask.get(i), countDownLatch)).start();
+            }
+        }
+
     }
 
     private void printUrlAndLocationDetails() {
@@ -132,6 +152,17 @@ class AssigneeMenu implements OptionsMenu {
     }
 
     private void changeMultipleTaskStatus() {
+        List<Task> taskList = getMultipleTask();
+        List<Thread> threadList = new ArrayList<>(taskList.size());
+        for (Task taskItem: taskList) {
+            Thread thread = new Thread(new TaskWorker(taskItem, assigneeRepository));
+            thread.setPriority(Thread.MAX_PRIORITY - taskItem.getPriority());
+            threadList.add(thread);
+        }
+        threadList.forEach(Thread::start);
+    }
+
+    private List<Task> getMultipleTask() {
         long taskId = 0;
         Scanner sc = new Scanner(System.in);
         List<Task> taskList = new ArrayList<>();
@@ -148,13 +179,7 @@ class AssigneeMenu implements OptionsMenu {
                 }
             }
         } while (taskId != -1);
-        List<Thread> threadList = new ArrayList<>(taskList.size());
-        for (Task taskItem: taskList) {
-            Thread thread = new Thread(new TaskWorker(taskItem, assigneeRepository));
-            thread.setPriority(Thread.MAX_PRIORITY - taskItem.getPriority());
-            threadList.add(thread);
-        }
-        threadList.forEach(Thread::start);
+        return taskList;
     }
 
     private void changeTaskStatus() {
