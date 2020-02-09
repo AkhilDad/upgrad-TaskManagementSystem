@@ -1,6 +1,5 @@
 package com.upgrad.tms.menu;
 
-import com.sun.tools.javac.Main;
 import com.upgrad.tms.countdownlatch.ChildWorker;
 import com.upgrad.tms.countdownlatch.ParentWorker;
 import com.upgrad.tms.entities.Assignee;
@@ -8,6 +7,7 @@ import com.upgrad.tms.entities.Meeting;
 import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.entities.Todo;
 import com.upgrad.tms.exception.NotFoundException;
+import com.upgrad.tms.exchanger.ExchangeTaskWorker;
 import com.upgrad.tms.meeting.LocationLocator;
 import com.upgrad.tms.meeting.MeetingLocationUrlWorker;
 import com.upgrad.tms.meeting.MeetingUrlLocationWorker;
@@ -22,10 +22,7 @@ import com.upgrad.tms.util.TaskStatus;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 class AssigneeMenu implements OptionsMenu {
@@ -58,8 +55,9 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("8. Print location and url details for meetings");
         System.out.println("9. Change parent tas status after multiple child task are done");
         System.out.println("10. Run all tasks in phases");
-        System.out.println("11. Exit");
-        System.out.println("12. Change all task status to pending");
+        System.out.println("11. Exchange title of the tasks");
+        System.out.println("12. Exit");
+        System.out.println("13. Change all task status to pending");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -97,15 +95,24 @@ class AssigneeMenu implements OptionsMenu {
                 runTasksInPhases();
                 break;
             case 11:
-                MainMenu.exit();
+                exchangeTitleOfTasks();
                 break;
             case 12:
+                MainMenu.exit();
+                break;
+            case 13:
                 changeTaskStatusToPending();
                 break;
             default:
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void exchangeTitleOfTasks() {
+        List<Task> taskList = assigneeRepository.getAssignee(MainMenu.loggedInUserName).getTaskCalendar().getTaskList();
+        Exchanger exchanger = new Exchanger();
+        taskList.stream().map(task -> new Thread(new ExchangeTaskWorker(assigneeRepository, task, exchanger))).forEach(Thread::start);
     }
 
     private void runTasksInPhases() {
