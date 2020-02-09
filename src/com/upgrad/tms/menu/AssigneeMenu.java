@@ -1,6 +1,5 @@
 package com.upgrad.tms.menu;
 
-import com.sun.tools.javac.Main;
 import com.upgrad.tms.countdownlatch.ChildWorker;
 import com.upgrad.tms.countdownlatch.ParentWorker;
 import com.upgrad.tms.entities.Assignee;
@@ -8,10 +7,12 @@ import com.upgrad.tms.entities.Meeting;
 import com.upgrad.tms.entities.Task;
 import com.upgrad.tms.entities.Todo;
 import com.upgrad.tms.exception.NotFoundException;
+import com.upgrad.tms.exchanger.ExchangeTaskWorker;
 import com.upgrad.tms.meeting.LocationLocator;
 import com.upgrad.tms.meeting.MeetingLocationUrlWorker;
 import com.upgrad.tms.meeting.MeetingUrlLocationWorker;
 import com.upgrad.tms.meeting.UrlLocator;
+import com.upgrad.tms.phaser.PhaserTaskWorker;
 import com.upgrad.tms.priority.PriorityChildWorker;
 import com.upgrad.tms.priority.PriorityParentWorker;
 import com.upgrad.tms.priority.ShareObject;
@@ -53,8 +54,10 @@ class AssigneeMenu implements OptionsMenu {
         System.out.println("7. Run task according to the priority");
         System.out.println("8. Print location and url details for meetings");
         System.out.println("9. Change parent tas status after multiple child task are done");
-        System.out.println("10. Exit");
-        System.out.println("11. Change all task status to pending");
+        System.out.println("10. Exchange title of the tasks");
+        System.out.println("11. Run all tasks in phases");
+        System.out.println("12. Exit");
+        System.out.println("13. Change all task status to pending");
         int choice = 0;
 
         choice = sc.nextInt();
@@ -89,15 +92,41 @@ class AssigneeMenu implements OptionsMenu {
                 changeParentTaskStatusAfterChild();
                 break;
             case 10:
-                MainMenu.exit();
+                exchangeTitleOfTheTasks();
                 break;
             case 11:
+                runTasksInPhases();
+                break;
+            case 12:
+                MainMenu.exit();
+                break;
+            case 13:
                 changeTaskStatusToPending();
                 break;
             default:
                 wrongInput();
         }
         showTopOptions();
+    }
+
+    private void runTasksInPhases() {
+        List<Task> taskList = getMultipleTask();
+        Phaser phaser = new Phaser(taskList.size());
+        List<Thread> threadList = taskList.stream().map(task -> new Thread(new PhaserTaskWorker(assigneeRepository, task, phaser))).collect(Collectors.toList());
+        for (Thread thread : threadList) {
+            thread.start();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void exchangeTitleOfTheTasks() {
+        List<Task> taskList = assigneeRepository.getAssignee(MainMenu.loggedInUserName).getTaskCalendar().getTaskList();
+        Exchanger<String> exchanger = new Exchanger<>();
+        taskList.stream().map(task -> new Thread(new ExchangeTaskWorker(assigneeRepository, task, exchanger))).forEach(Thread::start);
     }
 
     private void changeParentTaskStatusAfterChild() {
